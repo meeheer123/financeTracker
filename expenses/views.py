@@ -11,6 +11,7 @@ from django.db.models import Sum
 
 # Create your views here.
 
+@login_required(login_url='authentication/login')
 def search_expenses(request):
     if request.method == 'POST':
         search_str = json.loads(request.body).get('searchText')
@@ -37,6 +38,7 @@ def index(request):
     }
     return render(request, 'expenses/index.html', context)
 
+@login_required(login_url='authentication/login')
 def add_expense(request):
     categories = Category.objects.all()
     context = {
@@ -66,6 +68,7 @@ def add_expense(request):
 
         return redirect('expenses')
 
+@login_required(login_url='authentication/login')
 def expense_edit(request, id):
     expense = Expense.objects.get(pk=id)
     categories = Category.objects.all()
@@ -101,12 +104,14 @@ def expense_edit(request, id):
 
         return redirect('expenses')
 
+@login_required(login_url='authentication/login')
 def delete_expense(request, id):
     expense = Expense.objects.get(pk=id)
     expense.delete()
     messages.success(request, 'Expense removed')
     return redirect('expenses')
 
+@login_required(login_url='authentication/login')
 def expense_category_summary(request):
     # Get today's date and the date six months ago
     todays_date = datetime.date.today()
@@ -124,5 +129,6 @@ def expense_category_summary(request):
     # Return the data as a JSON response
     return JsonResponse({'expenses_category_data': expense_category_data})
 
+@login_required(login_url='authentication/login')
 def stats_view(request):
     return render(request, 'expenses/stats.html')
