@@ -1,5 +1,3 @@
-- the user if he is logged in should not be able to go to the login page manually
-
 - add fields in dashboard (add expense, add income, etc)
 
 - before deleting and logging out ask the user if he is sure
@@ -15,3 +13,5 @@
 - ask user which chart he wants to see, and make the charts look better
 
 - create the charts and ui like the video
+
+- if the user has logged in for first time then don't show charts

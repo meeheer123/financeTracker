@@ -50,6 +50,8 @@ def username_validation_view(request):
 
 def registration_view(request):
     if request.method == 'GET':
+        if request.user.is_authenticated:
+            return redirect('expenses')
         return render(request, 'authentication/register.html')
     
     if request.method == 'POST':
@@ -120,6 +122,8 @@ def verification_view(request, uidb64, token):
 
 def login_view(request):
     if request.method == 'GET':
+        if request.user.is_authenticated:
+            return redirect('expenses')
         return render(request, 'authentication/login.html')
     
     if request.method == 'POST':
