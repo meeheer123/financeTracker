@@ -59,6 +59,7 @@ const performSearch = debounce(async (searchValue) => {
             <td>${item.description}</td>
             <td>${item.date}</td>
             <td><a href="/edit-expense/${item.id}" class="btn btn-secondary btn-sm">Edit</a></td>
+            <td><a href="/delete-expense/${item.id}" class="btn btn-danger btn-sm">Delete</a></td>
           `;
           fragment.appendChild(tr);
         });

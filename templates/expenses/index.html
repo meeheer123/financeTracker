@@ -45,7 +45,7 @@
         <th>Category</th>
         <th>Description</th>
         <th>Date</th>
-        <th></th>
+        <th>Operations</th>
       </tr>
     </thead>
 
@@ -59,10 +59,13 @@
 
         <td>
           <a
-            href="{% url 'expense-edit' expense.id  %}"
-            class="btn btn-secondary btn-sm"
-            >Edit</a
-          >
+            href="{% url 'expense-edit' expense.id %}"
+            class="btn btn-secondary btn-sm me-1 mr-1"
+          >Edit</a>
+          <a
+            href="{% url 'expense-delete' expense.id %}"
+            class="btn btn-danger btn-sm"
+          >Delete</a>
         </td>
       </tr>
 
