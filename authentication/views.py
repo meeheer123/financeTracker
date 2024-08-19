@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib.auth.models import User
-from validate_email import validate_email
 from django.contrib import messages
 from django.core.mail import EmailMessage
 from django.contrib.sites.shortcuts import get_current_site
@@ -13,7 +12,7 @@ from django.urls import reverse
 from django.contrib import auth
 import json
 from userpreferences.models import UserPreference
-
+from django.core.validators import validate_email
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 import threading
@@ -32,11 +31,14 @@ def email_validation_view(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         email = data['email']
-        if not validate_email(email):
+        try:
+            validate_email(email)
+            if User.objects.filter(email=email).exists():
+                return JsonResponse({'email_error': 'Sorry, email in use. Choose another one.'}, status=409)
+            return JsonResponse({'email_valid': True})
+        except:
             return JsonResponse({'email_error': 'Email is invalid'}, status=400)
-        if User.objects.filter(email=email).exists():
-            return JsonResponse({'email_error': 'Sorry, email in use. Choose another one.'}, status=409)
-        return JsonResponse({'email_valid': True})
+        
 
 def username_validation_view(request):
     if request.method == 'POST':
@@ -95,9 +97,9 @@ def registration_view(request):
                 )
                 EmailThread(email).start()
                 messages.success(request, 'Account successfully created')
-                # add default preference as INR
-                UserPreference.objects.create(user=user, currency='INR: Indian Rupee')
-                return render(request, 'authentication/register.html')
+                # add default currency preference
+                UserPreference.objects.create(user=user, currency='USD')
+                return redirect('login')
 
         return render(request, 'authentication/register.html')
 

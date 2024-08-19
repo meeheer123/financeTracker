@@ -6,6 +6,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 import json
+from userpreferences.models import UserPreference
 
 class AuthenticationTests(TestCase):
     
@@ -18,6 +19,7 @@ class AuthenticationTests(TestCase):
             email=self.email,
             password=self.password
         )
+        UserPreference.objects.create(user=self.user, currency='INR')
     
     def test_email_validation_valid(self):
         response = self.client.post(reverse('validate-email'), 
@@ -73,8 +75,7 @@ class AuthenticationTests(TestCase):
             'email': 'newuser@example.com',
             'password': 'newpassword123'
         })
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'authentication/register.html')
+        self.assertRedirects(response, reverse('login'))
 
     def test_registration_short_password(self):
         response = self.client.post(reverse('register'), {

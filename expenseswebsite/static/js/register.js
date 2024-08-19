@@ -32,66 +32,94 @@ showPasswordToggle.addEventListener('click', (e) => {
 });
 
 const validateEmail = (e) => {
-    const emailVal = e.target.value;
+    const emailVal = e.target.value.trim();  // Trim any extra spaces
 
-    emailField.classList.remove("is-invalid");
-    emailFeedbackArea.style.display = "none";
+    usernameField.classList.remove('is-valid');  // Optional: if you have a usernameField, remove its validity
+    emailField.classList.remove('is-invalid');
+    emailField.classList.remove('is-valid');
+    emailFeedbackArea.style.display = 'none';
 
-    if (emailVal.length > 0) {
-        fetch("/authentication/validate-email/", {
-            body: JSON.stringify({ email: emailVal }),
-            method: "POST",
-        })
-        .then((res) => res.json())
-        .then((data) => {
-            if (data.email_error) {
-                isEmailValid = false;
-                emailField.classList.add("is-invalid");
-                emailFeedbackArea.style.display = "block";
-                emailFeedbackArea.innerHTML = `<p>${data.email_error}</p>`;
-            } else {
-                isEmailValid = true;
-                emailField.classList.remove("is-invalid");
-                emailField.classList.add("is-valid");
-                emailFeedbackArea.style.display = "none";
-            }
-            toggleSubmitButton();  // Check if the submit button should be enabled/disabled
-        });
+    if (emailVal.length === 0) {
+        // Handle the case where the input is empty
+        emailFeedbackArea.style.display = 'block';
+        emailFeedbackArea.innerHTML = '<p>Email field cannot be empty</p>';
+        isEmailValid = false;
+        toggleSubmitButton();  // Ensure submit button is disabled if empty
+        return;  // Exit the function early
     }
+
+    fetch('/authentication/validate-email/', {
+        body: JSON.stringify({ email: emailVal }),
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then((res) => res.json())
+    .then((data) => {
+        if (data.email_error) {
+            isEmailValid = false;
+            emailField.classList.add('is-invalid');
+            emailFeedbackArea.style.display = 'block';
+            emailFeedbackArea.innerHTML = `<p>${data.email_error}</p>`;
+        } else {
+            isEmailValid = true;
+            emailField.classList.remove('is-invalid');
+            emailField.classList.add('is-valid');
+            emailFeedbackArea.style.display = 'none';
+        }
+        toggleSubmitButton();  // Check if the submit button should be enabled/disabled
+    });
 };
 
+
 const validateUsername = (e) => {
-    const usernameVar = e.target.value;
+    const usernameVar = e.target.value.trim();  // Trim any extra spaces
 
     usernameSuccessOutput.style.display = 'block';
     usernameSuccessOutput.textContent = `Checking ${usernameVar}`;
 
     usernameField.classList.remove('is-invalid');
+    usernameField.classList.remove('is-valid');
     feedbackArea.style.display = 'none';
 
-    if (usernameVar.length > 0) {
-        fetch('/authentication/validate-username/', {
-            body: JSON.stringify({ username: usernameVar }),
-            method: 'POST',
-        })
-        .then((res) => res.json())
-        .then((data) => {
-            usernameSuccessOutput.style.display = 'none';
-            if (data.username_error) {
-                isUsernameValid = false;
-                usernameField.classList.add('is-invalid');
-                feedbackArea.style.display = 'block';
-                feedbackArea.innerHTML = `<p>${data.username_error}</p>`;
-            } else {
-                isUsernameValid = true;
-                usernameField.classList.remove('is-invalid');
-                usernameField.classList.add('is-valid');
-                feedbackArea.style.display = 'none';
-            }
-            toggleSubmitButton();  // Check if the submit button should be enabled/disabled
-        });
+    if (usernameVar.length === 0) {
+        // Handle the case where the input is empty
+        usernameSuccessOutput.style.display = 'none';
+        usernameField.classList.remove('is-invalid');
+        usernameField.classList.remove('is-valid');
+        feedbackArea.style.display = 'block';
+        feedbackArea.innerHTML = '<p>Username field cannot be empty</p>';
+        isUsernameValid = false;
+        toggleSubmitButton();  // Ensure submit button is disabled if empty
+        return;  // Exit the function early
     }
+
+    fetch('/authentication/validate-username/', {
+        body: JSON.stringify({ username: usernameVar }),
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then((res) => res.json())
+    .then((data) => {
+        usernameSuccessOutput.style.display = 'none';
+        if (data.username_error) {
+            isUsernameValid = false;
+            usernameField.classList.add('is-invalid');
+            feedbackArea.style.display = 'block';
+            feedbackArea.innerHTML = `<p>${data.username_error}</p>`;
+        } else {
+            isUsernameValid = true;
+            usernameField.classList.remove('is-invalid');
+            usernameField.classList.add('is-valid');
+            feedbackArea.style.display = 'none';
+        }
+        toggleSubmitButton();  // Check if the submit button should be enabled/disabled
+    });
 };
+
 
 // Enable or disable the submit button based on validation states
 function toggleSubmitButton() {
