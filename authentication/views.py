@@ -12,6 +12,7 @@ from .utils import account_activation_token
 from django.urls import reverse
 from django.contrib import auth
 import json
+from userpreferences.models import UserPreference
 
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
@@ -134,6 +135,8 @@ def login_view(request):
                         auth.login(request, user)
                         messages.success(request, 'Welcome, ' +
                                          user.username+' you are now logged in')
+                        # add default preference as INR
+                        UserPreference.objects.create(user=user, currency='INR')
                         return redirect('expenses')
                     messages.error(
                         request, 'Invalid credentials, try again')
