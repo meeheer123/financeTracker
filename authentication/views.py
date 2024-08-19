@@ -136,7 +136,7 @@ def login_view(request):
                         messages.success(request, 'Welcome, ' +
                                          user.username+' you are now logged in')
                         # add default preference as INR
-                        UserPreference.objects.create(user=user, currency='INR')
+                        UserPreference.objects.create(user=user, currency='INR: Indian Rupee')
                         return redirect('expenses')
                     messages.error(
                         request, 'Invalid credentials, try again')
