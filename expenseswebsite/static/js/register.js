@@ -8,6 +8,10 @@ const emailSuccessOutput = document.querySelector('.emailSuccessOutput');
 const showPasswordToggle = document.querySelector('.showPasswordToggle');
 const submitBtn = document.querySelector('.submit-btn');
 
+// Track validation states
+let isUsernameValid = false;
+let isEmailValid = false;
+
 // Debounce function
 function debounce(func, delay) {
     let timer;
@@ -40,15 +44,18 @@ const validateEmail = (e) => {
         })
         .then((res) => res.json())
         .then((data) => {
-            console.log("data", data);
             if (data.email_error) {
-                submitBtn.disabled = true;
+                isEmailValid = false;
                 emailField.classList.add("is-invalid");
                 emailFeedbackArea.style.display = "block";
                 emailFeedbackArea.innerHTML = `<p>${data.email_error}</p>`;
             } else {
-                submitBtn.removeAttribute('disabled');
+                isEmailValid = true;
+                emailField.classList.remove("is-invalid");
+                emailField.classList.add("is-valid");
+                emailFeedbackArea.style.display = "none";
             }
+            toggleSubmitButton();  // Check if the submit button should be enabled/disabled
         });
     }
 };
@@ -71,16 +78,29 @@ const validateUsername = (e) => {
         .then((data) => {
             usernameSuccessOutput.style.display = 'none';
             if (data.username_error) {
-                submitBtn.disabled = true;
+                isUsernameValid = false;
                 usernameField.classList.add('is-invalid');
                 feedbackArea.style.display = 'block';
                 feedbackArea.innerHTML = `<p>${data.username_error}</p>`;
             } else {
-                submitBtn.removeAttribute('disabled');
+                isUsernameValid = true;
+                usernameField.classList.remove('is-invalid');
+                usernameField.classList.add('is-valid');
+                feedbackArea.style.display = 'none';
             }
+            toggleSubmitButton();  // Check if the submit button should be enabled/disabled
         });
     }
 };
+
+// Enable or disable the submit button based on validation states
+function toggleSubmitButton() {
+    if (isUsernameValid && isEmailValid) {
+        submitBtn.removeAttribute('disabled');
+    } else {
+        submitBtn.disabled = true;
+    }
+}
 
 emailField.addEventListener("keyup", debounce(validateEmail, 300));  // Debounce for email
 usernameField.addEventListener('keyup', debounce(validateUsername, 300));  // Debounce for username
