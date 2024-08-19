@@ -95,6 +95,8 @@ def registration_view(request):
                 )
                 EmailThread(email).start()
                 messages.success(request, 'Account successfully created')
+                # add default preference as INR
+                UserPreference.objects.create(user=user, currency='INR: Indian Rupee')
                 return render(request, 'authentication/register.html')
 
         return render(request, 'authentication/register.html')
@@ -139,8 +141,6 @@ def login_view(request):
                         auth.login(request, user)
                         messages.success(request, 'Welcome, ' +
                                          user.username+' you are now logged in')
-                        # add default preference as INR
-                        UserPreference.objects.create(user=user, currency='INR: Indian Rupee')
                         return redirect('expenses')
                     messages.error(
                         request, 'Invalid credentials, try again')
