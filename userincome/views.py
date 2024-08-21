@@ -6,6 +6,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 import json
 from django.http import JsonResponse
+import datetime
+from django.db.models import Sum
 
 # Create your views here.
 
@@ -112,3 +114,31 @@ def delete_income(request, id):
     income.delete()
     messages.success(request, 'Record removed')
     return redirect('income')
+
+@login_required(login_url='authentication/login')
+def income_source_summary(request):
+    # Get today's date and the date six months ago
+    todays_date = datetime.date.today()
+    six_months_ago = todays_date - datetime.timedelta(days=30 * 6)
+
+    # Filter income by the current user and the date range
+    income = UserIncome.objects.filter(owner=request.user, date__gte=six_months_ago, date__lte=todays_date)
+
+    # Aggregate the total amount for each source using Sum
+    finalrep = income.values('source').annotate(total_amount=Sum('amount')).order_by('source')
+
+    # Prepare the response dictionary
+    income_source_data = {item['source']: item['total_amount'] for item in finalrep}
+
+    # Return the data as a JSON response
+    return JsonResponse({'income_source_data': income_source_data})
+
+@login_required(login_url='authentication/login')
+def stats_view(request):
+    exists = False
+    res = income_source_summary(request)
+    print(json.loads(res.content.decode('utf-8')))
+    data = json.loads(res.content.decode('utf-8'))['income_source_data']
+    if data:
+        exists = True    
+    return render(request, 'income/statsIncome.html', {'exists': exists})

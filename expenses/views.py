@@ -131,4 +131,9 @@ def expense_category_summary(request):
 
 @login_required(login_url='authentication/login')
 def stats_view(request):
-    return render(request, 'expenses/stats.html')
+    exists = False
+    res = expense_category_summary(request)
+    data = json.loads(res.content.decode('utf-8'))['expenses_category_data']
+    if data:
+        exists = True    
+    return render(request, 'expenses/statsExpenses.html', {'exists': exists})
