@@ -24,7 +24,7 @@
     </div>
   </div>
 
-  <div class="container">
+  <div class="container" style="margin-bottom 3rem">
     {% include 'partials/_messages.html' %} {% if expenses.count %}
 
     <div class="row">
@@ -64,7 +64,8 @@
           >Edit</a>
           <a
             href="{% url 'expense-delete' expense.id %}"
-            class="btn btn-danger btn-sm"
+            class="btn btn-danger btn-sm" id="delete" 
+            onclick="return confirm('Are you sure you want to delete this item?');"
           >Delete</a>
         </td>
       </tr>

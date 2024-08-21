@@ -157,3 +157,5 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
