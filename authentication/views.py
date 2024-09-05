@@ -167,45 +167,47 @@ def RequestPasswordResetEmail(request):
     
     if request.method == "POST":
 
-        email = request.POST['email']
+        email = request.POST['email'].strip()
 
         context = {
             'values': request.POST
         }
+        try:
+            validate_email(email)
+            current_site = get_current_site(request)
+            user = User.objects.filter(email=email)
 
-        if not validate_email(email):
+            if user.exists():
+                email_contents = {
+                'user': user[0],
+                'domain': current_site.domain,
+                'uid': urlsafe_base64_encode(force_bytes(user[0].pk)),
+                'token': PasswordResetTokenGenerator().make_token(user[0]),
+            }
+
+            link = reverse('reset-user-password', kwargs={
+                            'uidb64': email_contents['uid'], 'token': email_contents['token']})
+
+            email_subject = 'Password Reset Instructions'
+
+            reset_url = 'http://'+current_site.domain+link
+
+            email = EmailMessage(
+                email_subject,
+                'Hi there, Please use the link below to reset your password \n'+ reset_url,
+                'noreply@semycolon.com',
+                [email],
+            )
+            EmailThread(email).start()
+
+            messages.success(request, 'We have sent you an email to reset your password')
+            
+            return render(request, 'authentication/reset-password.html')
+        except Exception as identifier:
             messages.error(request, 'Please enter a valid email')
             return render(request, 'authentication/reset-password.html', context)
         
-        current_site = get_current_site(request)
-        user = User.objects.filter(email=email)
-
-        if user.exists():
-            email_contents = {
-            'user': user[0],
-            'domain': current_site.domain,
-            'uid': urlsafe_base64_encode(force_bytes(user[0].pk)),
-            'token': PasswordResetTokenGenerator().make_token(user[0]),
-        }
-
-        link = reverse('reset-user-password', kwargs={
-                        'uidb64': email_contents['uid'], 'token': email_contents['token']})
-
-        email_subject = 'Password Reset Instructions'
-
-        reset_url = 'http://'+current_site.domain+link
-
-        email = EmailMessage(
-            email_subject,
-            'Hi there, Please use the link below to reset your password \n'+ reset_url,
-            'noreply@semycolon.com',
-            [email],
-        )
-        EmailThread(email).start()
-
-        messages.success(request, 'We have sent you an email to reset your password')
         
-        return render(request, 'authentication/reset-password.html')
 
 
 def completePasswordReset(request, uidb64, token):
