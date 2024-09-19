@@ -96,7 +96,7 @@ WSGI_APPLICATION = 'expenseswebsite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'financetracker',
+        'NAME': 'finance_tracker',
         'USER': 'admin',
         'PASSWORD': '35789512357',
         'HOST': 'localhost',
